@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="gtool" default="publish">
+
+	<!-- properies -->
+	<property name="src.dir" value="src" />
+	<property name="config.dir" value="file" />
+	<property name="classes.dir" value="bin" />
+	<property name="lib.dir" value="lib" />
+	<property name="dist.dir" value="dist" />
+	<property name="report.dir" value="report" />
+	<property name="build.dir" value="build" />
+	<property name="jar.name" value="${ant.project.name}.jar" />
+
+	<!-- 定义classpath -->
+	<path id="master-classpath">
+		<fileset file="${lib.dir}/*.jar" />
+		<pathelement path="${classes.dir}" />
+	</path>
+
+	<!-- 初始化任务 -->
+	<target name="init">
+		<delete dir="${build.dir}"/>
+		<mkdir dir="${build.dir}"/>
+	</target>
+
+	<!-- 编译 -->
+	<target name="compile" depends="init" description="compile the source files">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" target="1.6" includeAntRuntime="false">
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+
+	<!-- 打包成jar -->
+	<target name="build" depends="compile" description="make .jar file">
+		<mkdir dir="${report.dir}" />
+		<jar destfile="${report.dir}/${jar.name}" basedir="${classes.dir}"></jar>
+	</target>
+	
+	<!-- 打包成jar -->
+	<target name="publish" depends="build" description="make .jar file">
+		<mkdir dir="${build.dir}/run/lib" />
+		<mkdir dir="${build.dir}/run/file/data" />
+		<mkdir dir="${build.dir}/run/file/db" />
+		<mkdir dir="${build.dir}/run/file/out" />
+		<mkdir dir="${build.dir}/run/doc" />
+		<copy todir="${build.dir}/run/file">
+			<fileset dir="${config.dir}">
+				<include name="*"/>
+				<include name="db/*.*"/>
+				<exclude name="data/*.*"/>
+				<exclude name="out/*.*"/>
+			</fileset>
+		</copy>
+		<copy todir="${build.dir}/run/lib">
+			<fileset dir="${lib.dir}">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy todir="${build.dir}/run/doc">
+			<fileset dir="doc">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<copy file="${report.dir}/${jar.name}" todir="${build.dir}/run/lib" />
+		<copy file="tool-db2bean.bat" todir="${build.dir}/run" />
+		<zip basedir="${build.dir}/run" zipfile="${ant.project.name}.zip"/>
+	</target>
+</project>

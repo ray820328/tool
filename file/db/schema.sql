@@ -135,10 +135,10 @@ create table t_character
    lastLogoutTime       bigint,
    ip                   varchar(30),
    gameVersion          varchar(30),
-   vsRank               int comment '¾º¼¼ÅÅÃû',
-   vsRankMax            int comment '¾º¼¼×î¸ßÅÅÃû',
-   rechargeTotal        int comment '³äÖµ×Ü½ğ¶î£¨×êÊ¯/Ôª±¦£©',
-   rechargeStage        int comment 'µ±Ç°ÔËÓª½×¶Î³äÖµ£¨×êÊ¯/Ôª±¦£©',
+   vsRank               int comment 'ç«æŠ€æ’å',
+   vsRankMax            int comment 'ç«æŠ€æœ€é«˜æ’å',
+   rechargeTotal        int comment 'å……å€¼æ€»é‡‘é¢ï¼ˆé’»çŸ³/å…ƒå®ï¼‰',
+   rechargeStage        int comment 'å½“å‰è¿è¥é˜¶æ®µå……å€¼ï¼ˆé’»çŸ³/å…ƒå®ï¼‰',
    createTime           bigint,
    enabled              tinyint,
    primary key (id)
@@ -152,7 +152,7 @@ DEFAULT CHARACTER SET = utf8;
 create table t_exchange_data_format
 (
    id                   bigint not null,
-   gameId               int default 0 comment '0:ËùÓĞÏµÍ³',
+   gameId               int default 0 comment '0:æ‰€æœ‰ç³»ç»Ÿ',
    name                 varchar(255),
    content              longtext,
    description          longtext,
@@ -162,7 +162,7 @@ create table t_exchange_data_format
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-alter table t_exchange_data_format comment 'Êı¾İ´«µİÍ¨ĞÅ¸ñÊ½¶¨Òå';
+alter table t_exchange_data_format comment 'æ•°æ®ä¼ é€’é€šä¿¡æ ¼å¼å®šä¹‰';
 
 /*==============================================================*/
 /* Table: t_game                                                */
@@ -177,7 +177,7 @@ create table t_game
    offlineTime          bigint,
    income               bigint,
    encryptKey           text,
-   configKey            varchar(255) comment 'ÅäÖÃ¹Ø¼ü×Ö',
+   configKey            varchar(255) comment 'é…ç½®å…³é”®å­—',
    description          varchar(255),
    enabled              tinyint(1),
    primary key (id)
@@ -207,7 +207,7 @@ DEFAULT CHARACTER SET = utf8;
 create table t_game_complete_condition
 (
    id                   bigint not null,
-   gameId               int comment '0:ËùÓĞ',
+   gameId               int comment '0:æ‰€æœ‰',
    completionKey        varchar(50),
    description          varchar(255),
    createTime           bigint,
@@ -260,9 +260,9 @@ create table t_game_mail
    createUserId         int,
    approveUserId        int,
    gameId               int,
-   gameServerIds        text comment 'Èç1_2_3£¬¿ÕÎªÈ«·ş',
-   characterIds         text comment 'gameServerId1=cid1_cid2..|gameServerId2=.. cidÎªÓÎÏ··şÎñÆ÷ÖĞµÄ½ÇÉ«id',
-   guildIds             varchar(255) comment 'gameServerId1=gid1_..|gameServerId2=.. gidÎªÓÎÏ··şÎñÆ÷ÖĞµÄ¹¤»áid',
+   gameServerIds        text comment 'å¦‚1_2_3ï¼Œç©ºä¸ºå…¨æœ',
+   characterIds         text comment 'gameServerId1=cid1_cid2..|gameServerId2=.. cidä¸ºæ¸¸æˆæœåŠ¡å™¨ä¸­çš„è§’è‰²id',
+   guildIds             varchar(255) comment 'gameServerId1=gid1_..|gameServerId2=.. gidä¸ºæ¸¸æˆæœåŠ¡å™¨ä¸­çš„å·¥ä¼šid',
    title                varchar(80),
    content              text,
    items                text,
@@ -270,7 +270,7 @@ create table t_game_mail
    exipreTime           bigint,
    startTime            bigint,
    approveTime          bigint,
-   state                int comment '×´Ì¬(0ÎªÎ´ÉóºË,1ÎªÉóºËÍ¨¹ı,2ÎªÒÑ·¢ËÍ,3Îª¾Ü¾ø)',
+   state                int comment 'çŠ¶æ€(0ä¸ºæœªå®¡æ ¸,1ä¸ºå®¡æ ¸é€šè¿‡,2ä¸ºå·²å‘é€,3ä¸ºæ‹’ç»)',
    primary key (id)
 )
 ENGINE = InnoDB
@@ -285,14 +285,14 @@ create table t_game_notice
    createUserId         int,
    approveUserId        int,
    gameId               int,
-   gameServerIds        text comment 'Èç1|2|3£¬¿ÕÎªÈ«·ş',
+   gameServerIds        text comment 'å¦‚1|2|3ï¼Œç©ºä¸ºå…¨æœ',
    content              text,
    beginTime            bigint,
    endTime              bigint,
-   timeInterval         int comment 'µ¥Î»Ãë',
+   timeInterval         int comment 'å•ä½ç§’',
    createTime           bigint,
    approveTime          bigint,
-   state                int comment '×´Ì¬(0ÎªÎ´ÉóºË,1ÎªÉóºËÍ¨¹ı,2ÎªÒÑ·¢ËÍ,3Îª¾Ü¾ø)',
+   state                int comment 'çŠ¶æ€(0ä¸ºæœªå®¡æ ¸,1ä¸ºå®¡æ ¸é€šè¿‡,2ä¸ºå·²å‘é€,3ä¸ºæ‹’ç»)',
    primary key (id)
 )
 ENGINE = InnoDB
@@ -307,8 +307,8 @@ create table t_game_operating
    createUserId         int,
    approveUserId        int,
    gameId               int,
-   gameServerIds        text comment 'Èç1_2_3£¬¿ÕÎªÈ«·ş',
-   configId             varchar(30) comment 'gameServerId1=cid1_cid2..|gameServerId2=.. cidÎªÓÎÏ··şÎñÆ÷ÖĞµÄ½ÇÉ«id',
+   gameServerIds        text comment 'å¦‚1_2_3ï¼Œç©ºä¸ºå…¨æœ',
+   configId             varchar(30) comment 'gameServerId1=cid1_cid2..|gameServerId2=.. cidä¸ºæ¸¸æˆæœåŠ¡å™¨ä¸­çš„è§’è‰²id',
    title                varchar(80),
    content              text,
    items                text,
@@ -317,7 +317,7 @@ create table t_game_operating
    exipreTime           bigint,
    startTime            bigint,
    approveTime          bigint,
-   state                int comment '×´Ì¬(0ÎªÎ´ÉóºË,1ÎªÉóºËÍ¨¹ı,2ÎªÒÑ·¢ËÍ,3Îª¾Ü¾ø)',
+   state                int comment 'çŠ¶æ€(0ä¸ºæœªå®¡æ ¸,1ä¸ºå®¡æ ¸é€šè¿‡,2ä¸ºå·²å‘é€,3ä¸ºæ‹’ç»)',
    primary key (id)
 )
 ENGINE = InnoDB
@@ -361,7 +361,7 @@ create table t_game_register_statistics
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-alter table t_game_register_statistics comment 'ÓÎÏ··şÎñÆ÷Ã¿ÌìÍ³¼ÆÒ»ÌõÉÏ´«£¬»òÕßËæÊ±À­È¡Í³¼ÆµÄµ±Ç°Ò»Ìõ';
+alter table t_game_register_statistics comment 'æ¸¸æˆæœåŠ¡å™¨æ¯å¤©ç»Ÿè®¡ä¸€æ¡ä¸Šä¼ ï¼Œæˆ–è€…éšæ—¶æ‹‰å–ç»Ÿè®¡çš„å½“å‰ä¸€æ¡';
 
 /*==============================================================*/
 /* Table: t_game_server                                         */
@@ -464,7 +464,7 @@ create table t_menu
    name                 varchar(100),
    url                  varchar(255),
    parentId             int default 0,
-   displayIndex         int default 0 comment 'ÏÔÊ¾Ë³Ğò',
+   displayIndex         int default 0 comment 'æ˜¾ç¤ºé¡ºåº',
    enabled              tinyint default 0,
    primary key (id)
 )
@@ -484,18 +484,18 @@ create table t_recharge_log
    level                int,
    lastVipExp           int,
    vipExp               int,
-   gold                 int comment 'Ê£Óà×êÊ¯',
-   goldGain             int comment '³äÖµ×êÊ¯',
-   goldGainExtra        int comment '¶îÍâ»ñµÃ×êÊ¯',
-   rechargeAmount       int comment '³äÖµ×êÊ¯',
-   rechargeFor          varchar(20) comment '³äÖµÀàĞÍ£ºµã¿¨£¬ÔÂ¿¨£¬³É³¤»ù½ğµÈ',
+   gold                 int comment 'å‰©ä½™é’»çŸ³',
+   goldGain             int comment 'å……å€¼é’»çŸ³',
+   goldGainExtra        int comment 'é¢å¤–è·å¾—é’»çŸ³',
+   rechargeAmount       int comment 'å……å€¼é’»çŸ³',
+   rechargeFor          varchar(20) comment 'å……å€¼ç±»å‹ï¼šç‚¹å¡ï¼Œæœˆå¡ï¼Œæˆé•¿åŸºé‡‘ç­‰',
    isFirstRecharge      tinyint,
    rechargePlatform     varchar(20),
    platform             varchar(20),
    time                 bigint,
    gainReason           varchar(100),
    updateTime           bigint,
-   money                int comment '»¨·ÑÏÖ½ğ',
+   money                int comment 'èŠ±è´¹ç°é‡‘',
    orderId              varchar(200),
    detail               varchar(255),
    status               tinyint,
@@ -527,7 +527,7 @@ DEFAULT CHARACTER SET = utf8;
 create table t_request_command
 (
    id                   bigint not null,
-   gameId               int default 0 comment '0:ÏµÍ³',
+   gameId               int default 0 comment '0:ç³»ç»Ÿ',
    code                 int,
    name                 varchar(100),
    content              varchar(255),
@@ -570,7 +570,7 @@ DEFAULT CHARACTER SET = utf8;
 create table t_system_code
 (
    id                   bigint not null,
-   gameId               int default 0 comment '0:ÏµÍ³',
+   gameId               int default 0 comment '0:ç³»ç»Ÿ',
    code                 int,
    displayIndex         int,
    name                 varchar(100),
@@ -580,7 +580,7 @@ create table t_system_code
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-alter table t_system_code comment 'ÒµÎñcode¶¨Òå¹ÜÀí';
+alter table t_system_code comment 'ä¸šåŠ¡codeå®šä¹‰ç®¡ç†';
 
 /*==============================================================*/
 /* Table: t_user                                                */

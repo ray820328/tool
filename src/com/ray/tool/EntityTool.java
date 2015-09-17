@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ray.tool.util.FileUtil;
+import com.ray.tool.util.Log;
 import com.ray.tool.util.PropertiesUtil;
 import com.ray.tool.util.StringUtil;
 
@@ -38,7 +39,7 @@ public class EntityTool {
 			throws Exception {
 		Map<String, List<String>> tableMap = new HashMap<String, List<String>>();// tableName
 																					// ->
-																					// lines
+//		System.getProperties("user.dir");										// lines
 
 		File file = new File(schemaFile);
 		InputStream input = new FileInputStream(file);
@@ -81,50 +82,65 @@ public class EntityTool {
 
 	public static void main(String args[]) throws Exception {
 		// 本地化配置文件
-		Properties localProps = PropertiesUtil
-				.read("file/config_localize.properties");
-		logger.info("file/config_localize.properties");
-		for (Map.Entry<Object, Object> entry : localProps.entrySet()) {
-			logger.info(entry.getKey()
-					+ "=" + PropertiesUtil.getProperty(localProps, (String) entry.getKey()));
-		}
+//		Properties localProps = PropertiesUtil
+//				.read("file/config_localize.properties");
+//		logger.info("file/config_localize.properties");
+//		for (Map.Entry<Object, Object> entry : localProps.entrySet()) {
+//			logger.info(entry.getKey()
+//					+ "=" + PropertiesUtil.getProperty(localProps, (String) entry.getKey()));
+//		}
+		
+		String workDir = System.getProperty("user.dir") + "/";
 
 		DataConfig config = new DataConfig("file/db/db_schema2bean_config.txt");
 		String dataPath = config.getValue(DataConfig.DATA_PATH);
-		String javaOut = config.getValue(DataConfig.JAVA_OUT);
+		if(dataPath.indexOf(":") == -1){//不是绝对路径
+			dataPath = workDir + dataPath;
+		}
+		String javaOut = workDir + config.getValue(DataConfig.JAVA_OUT);
+		logger.info("javaOut: " + javaOut);
 		String asOut = config.getValue(DataConfig.AS_OUT);
 		String javaPackage = config.getValue(DataConfig.JAVA_PACKAGE);
 		String javaSuffix = config.getValue(DataConfig.JAVA_SUFFIX);
-		String xml_ibatis_template = config.getValue(DataConfig.xml_ibatis_template);
-		String xmlOut = config.getValue(DataConfig.xml_out);
+		String xml_ibatis_template = workDir + config.getValue(DataConfig.xml_ibatis_template);
+		String xmlOut = workDir + config.getValue(DataConfig.xml_out);
 		String xmlSuffix = config.getValue(DataConfig.xml_suffix);
 
 		Map<String, List<String>> tableMap = getTableMap(dataPath);
 		for (String tableName : tableMap.keySet()) {
+			try{
 			// if(!tableName.startsWith(key_table_prefix)){//table必须以't_'开始
 			// continue;
 			// }
-			String className = tableName.substring(key_table_prefix.length());
-			className = StringUtil.uppercaseFirstLetter(className, "_");// 首字母大写
-
-			List<String> lines = tableMap.get(tableName);
-			/** 生成java */
-			String java = createBean(tableName, className, javaPackage, lines);
-			String javafilename = javaOut + className + javaSuffix;
-			logger.info("java file = " + javafilename);
-			File javaFile = FileUtil.createFile(javafilename, false);
-			FileUtil.write(javaFile, java);
-			
-			/** 生成java */
-			String xmlContent = createXml(xml_ibatis_template, tableName, className, javaPackage, lines);
-			String xmlfilename = xmlOut + className + xmlSuffix;
-			logger.info("xml file = " + xmlfilename);
-			File xmlFile = FileUtil.createFile(xmlfilename, false);
-			FileUtil.write(xmlFile, xmlContent);
+				String className = tableName.substring(key_table_prefix.length());
+				className = StringUtil.uppercaseFirstLetter(className, "_");// 首字母大写
+	
+				List<String> lines = tableMap.get(tableName);
+				if(config.getValue("bean_java")!=null && Boolean.valueOf(config.getValue("bean_java"))){
+					/** 生成java */
+					String java = createBean(config, tableName, className, javaPackage, lines);
+					String javafilename = javaOut + className + javaSuffix;
+					logger.info("java file = " + javafilename);
+					File javaFile = FileUtil.createFile(javafilename, false);
+					FileUtil.write(javaFile, java);
+				}
+				
+				if(config.getValue("bean_xml")!=null && Boolean.valueOf(config.getValue("bean_xml"))){
+					/** 生成ibatis xml */
+					String xmlContent = createXml(xml_ibatis_template, tableName, className, javaPackage, lines);
+					String xmlfilename = xmlOut + className + xmlSuffix;
+					logger.info("xml file = " + xmlfilename);
+					File xmlFile = FileUtil.createFile(xmlfilename, false);
+					FileUtil.write(xmlFile, xmlContent);
+				}
+			}catch(Exception ex){
+				Log.error("生成文件: " + tableName, ex);
+				throw ex;
+			}
 		}
 	}
 
-	public static String createBean(String tableName, String className,
+	public static String createBean(DataConfig config, String tableName, String className,
 			String pack, List<String> lines) throws Exception {
 		StringBuilder importStr = new StringBuilder();
 //		importStr.append("\r\nimport com.db.bean.BaseBean;");
@@ -136,7 +152,12 @@ public class EntityTool {
 		sb.append("\r\n");
 		sb.append(key_imports);
 		sb.append("\r\n");
-		// sb.append("\r\n@Data");
+		if(config.getValue("class_persist_annotation")!=null &&
+				Boolean.valueOf(config.getValue("class_persist_annotation"))){
+			importStr.append("\r\nimport javax.persistence.Table;");
+			importStr.append("\r\nimport javax.persistence.Column");
+			sb.append("\r\n@Table(name=\"" + tableName + "\")");
+		}
 		sb.append("\r\npublic class ").append(className)
 				.append(" extends BaseBean<").append(className).append("> {");
 		// sb.append("\r\npublic class ").append(className).append(" extends BaseBean {");
@@ -146,19 +167,31 @@ public class EntityTool {
 			}
 			String columnName = null;
 			String type = null;
+			String comment = "";//注释
 			String[] keyWords = line.split(" ");
 			for (String keyWord : keyWords) {
-				if (keyWord != null && !"".equals(keyWord)) {
-					if (columnName == null) {// id bigint not nullauto_increment,
-						columnName = keyWord;
-					} else {
-						type = keyWord;
-						break;
+				try{
+					if (keyWord != null && !"".equals(keyWord)) {
+						if (columnName == null) {// id bigint not nullauto_increment,
+							columnName = keyWord;
+						} else if(type == null){
+							type = keyWord;
+						}else if(comment==null && keyWord.trim().startsWith("'")){
+							int endIndex = keyWord.lastIndexOf("'")>-1 ? keyWord.lastIndexOf("'") : keyWord.length();
+							comment = keyWord.substring(keyWord.indexOf("'")+1, endIndex);
+						}else if(comment==null && keyWord.trim().startsWith("\"")){
+							int endIndex = keyWord.lastIndexOf("'")>-1 ? keyWord.lastIndexOf("'") : keyWord.length();
+							comment = keyWord.substring(keyWord.indexOf("\"")+1, endIndex);
+						}
 					}
+				}catch(Exception ex){
+					Log.error(keyWord, ex);
+					throw ex;
 				}
 			}
+//			System.out.println("comment: " + comment);
 			// 属性名
-			String name = columnName.startsWith("_") ? columnName.substring(1) : columnName;
+			String name = columnName.startsWith("_") ? columnName.substring(1).trim() : columnName.trim();
 			String typeStr = "";// 属性类型
 			StringBuilder getter = new StringBuilder();
 			StringBuilder propPrefix = new StringBuilder();
@@ -187,8 +220,12 @@ public class EntityTool {
 					} else {
 						throw new RuntimeException("未知类型:" + type);
 					}
+					if(config.getValue("var_persist_annotation")!=null &&
+							Boolean.valueOf(config.getValue("var_persist_annotation"))){
+						propPrefix.append("\r\n\t").append("@Column(name=\"" + name + "\")");
+					}
 					propPrefix.append("\r\n\t").append("private ").append(typeStr).append(" ").append(name)
-							.append(";\t\t//").append("");// comment
+							.append(";\t\t//").append(comment);// comment
 //				} else {
 //					propPrefix.append("\r\n\tprivate Long id;\t\t//").append("");// comment
 //				}
@@ -250,7 +287,7 @@ public class EntityTool {
 			for (String keyWord : keyWords) {
 				if (keyWord != null && !"".equals(keyWord)) {
 					if (columnName == null) {// id bigint not nullauto_increment,
-						columnName = keyWord;
+						columnName = keyWord.trim();
 					} else {
 						type = keyWord;
 						break;

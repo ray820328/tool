@@ -1,4 +1,4 @@
-package com.ray.tool.util;
+package com.ray.tool.util.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,8 +19,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import com.ray.tool.util.http.CommonHttpRequest;
-import com.ray.tool.util.http.CookieManager;
+import com.ray.tool.util.Log;
 
 
 public class HttpUtil {

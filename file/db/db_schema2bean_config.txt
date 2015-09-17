@@ -1,7 +1,11 @@
-data_path=D:/schema.sql
-java_out=D:/ENV/eclipse/workspace/tool/file/out/db/java/
+data_path=file/db/schema.sql
+bean_java=true
+bean_xml=true
+class_persist_annotation=true
+var_persist_annotation=true
+java_out=file/out/db/java/
 java_package=com.cmge.admin.entity
 java_suffix=.java
-xml_ibatis_template=D:/ENV/eclipse/workspace/tool/file/db/template_ibatis2.xml
-xml_out=D:/ENV/eclipse/workspace/tool/file/out/db/xml/
+xml_ibatis_template=file/db/template_ibatis2.xml
+xml_out=file/out/db/xml/
 xml_suffix=.xml

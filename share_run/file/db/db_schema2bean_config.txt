@@ -1,0 +1,11 @@
+data_path=file/db/schema.sql
+bean_java=true
+bean_xml=true
+class_persist_annotation=false
+var_persist_annotation=false
+java_out=file/out/db/java/
+java_package=com.cmge.admin.entity
+java_suffix=.java
+xml_ibatis_template=file/db/template_ibatis2.xml
+xml_out=file/out/db/xml/
+xml_suffix=.xml

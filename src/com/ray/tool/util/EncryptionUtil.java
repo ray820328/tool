@@ -143,5 +143,16 @@ public class EncryptionUtil {
 		System.out.println("MD5后：" + encryptMD5(s));
 		System.out.println("MD5后(Base64)：" + hashMD5Base64(s));
 		System.out.println("MD5后再xor：" + xor(encryptMD5(s), new char[]{'f', 'u'}));
+		
+		String source = "{\n "+
+  "\"channelSdkClass\": \"com.sqwan.msdk.SQwanCore\","+
+  "\"channelAdapterClass\": \"com.cmge.cge.sdk.channel.Channel37\","+
+  "\"channelParams\": {"+
+    "\"appKey\": \"cC9PS5AOpUt87KreYunDH&d$whJFEyRm\","+
+    "\"currencyName\": \"钻石\""+
+  "}"+
+"}";
+		String dest = new String(Base64.encodeBase64(source.getBytes()));
+		System.out.println(dest);
 	}
 }

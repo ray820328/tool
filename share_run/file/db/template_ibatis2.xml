@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="@namespace@">
+	<typeAlias alias="@classAlias@" type="@BeanClass@" />
+	
+  <resultMap class="@classAlias@" id="@classAlias@" >
+	@ORMapping@
+  </resultMap>
+  <sql id="Base_Column_List" >
+    @ColumnList@
+  </sql>
+  <select id="get" resultMap="@classAlias@" parameterClass="@IdType@" >
+    select <include refid="Base_Column_List" />
+    from @TableName@ AS @TableShortName@ where @TableShortName@.id = #id#
+  </select>
+  <select id="query" resultMap="@classAlias@" parameterClass="map" >
+    select <include refid="Base_Column_List" /> from @TableName@ @TableShortName@ where 1=1 
+    <isNotEmpty property="id" prepend="and">
+    	@TableShortName@.id=#id#
+    </isNotEmpty>
+  </select>
+  <select id="queryCount" parameterClass="map" resultClass="Long">
+    select count(@TableShortName@.id) count from @TableName@ AS @TableShortName@ where 1=1
+    <isNotEmpty property="id" prepend="and">
+    	@TableShortName@.id=#id#
+    </isNotEmpty>
+  </select>
+  <select id="queryMap" resultClass="java.util.HashMap" parameterClass="map" >
+    select <include refid="Base_Column_List" />
+    from @TableName@ @TableShortName@ where 1=1
+    <isNotEmpty property="id" prepend="and">
+    	@TableShortName@.id=#id#
+    </isNotEmpty>
+  </select>
+  <select id="queryMapCount" parameterClass="map" resultClass="java.util.HashMap">
+    select count(@TableShortName@.id) count from @TableName@ AS @TableShortName@ where 1=1
+    <isNotEmpty property="id" prepend="and">
+    	@TableShortName@.id=#id#
+    </isNotEmpty>
+  </select>
+  <delete id="delete" parameterClass="@IdType@" >
+    delete from @TableName@ where id=#id#
+  </delete>
+  <insert id="add" parameterClass="@BeanClass@">
+    insert into @TableName@ (@insertColumns@) values(@insertValues@)
+  </insert>
+  <update id="update" parameterClass="@BeanClass@">
+    update @TableName@ set @updateValues@ where id=#id#
+  </update>
+  <update id="updateNotNull" parameterClass="@BeanClass@">
+    update @TableName@ set
+		@updateValuesNotNull@
+	where id=#id#
+  </update>
+</sqlMap>
